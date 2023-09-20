@@ -14,11 +14,12 @@
 namespace Orderbook {
 class Limit {
 public:
-  explicit Limit(const AddOrder &order)
-      : size_(1), limit_(order.limit()), total_shares_(order.shares()),
-        list_order_({order}), map_order_() {
-    map_order_[order.id()] = --list_order_.end();
-  }
+  explicit Limit(const AddOrder &);
+  Limit(const Limit &);
+
+  Limit(Limit &&);
+  void operator=(const Limit &);
+  void operator=(Limit &&);
 
   // get methods
   inline const limit_t &limit() const noexcept { return limit_; }
@@ -27,7 +28,8 @@ public:
   bool add_order(AddOrder &&);
   void match_order(AddOrder &);
 
-  constexpr size_t size() const noexcept { return size_; }
+  inline size_t size() const noexcept { return size_; }
+  inline shares_t total_shares() const noexcept { return total_shares_; }
   inline const std::list<AddOrder> &list_order() const noexcept {
     return list_order_;
   }

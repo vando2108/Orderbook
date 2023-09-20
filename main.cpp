@@ -13,9 +13,9 @@ int main() {
       Orderbook::AddOrder(1, Orderbook::Side::BUY, 10, 10, 10, 10),
       Orderbook::AddOrder(1, Orderbook::Side::SELL, 10, 11, 10, 10),
       Orderbook::AddOrder(1, Orderbook::Side::SELL, 6, 6, 10, 10),
-      // Orderbook::AddOrder(1, Orderbook::Side::SELL, 6, 6, 10, 10),
-      // Orderbook::AddOrder(1, Orderbook::Side::BUY, 2, 10, 10, 10),
-      // Orderbook::AddOrder(1, Orderbook::Side::BUY, 11, 10, 10, 10),
+      Orderbook::AddOrder(1, Orderbook::Side::SELL, 6, 6, 10, 10),
+      Orderbook::AddOrder(1, Orderbook::Side::BUY, 2, 10, 10, 10),
+      Orderbook::AddOrder(1, Orderbook::Side::BUY, 11, 10, 10, 10),
   };
 
   while (orders.size()) {
@@ -23,8 +23,8 @@ int main() {
     book.process_order(std::move(temp));
     orders.pop_back();
   }
+
   book.debug();
-  std::cerr << '\n';
 
   return 0;
 }

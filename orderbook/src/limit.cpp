@@ -5,6 +5,41 @@
 #include <ostream>
 
 namespace Orderbook {
+// move
+Limit::Limit(const AddOrder &order)
+    : size_(1), limit_(order.limit()), total_shares_(order.shares()),
+      list_order_({order}), map_order_() {
+  map_order_[order.id()] = --list_order_.end();
+}
+
+Limit::Limit(const Limit &other)
+    : size_(other.size_), limit_(other.limit_),
+      total_shares_(other.total_shares_), list_order_(other.list_order_),
+      map_order_(other.map_order_) {}
+
+Limit::Limit(Limit &&other) {
+  std::swap(size_, other.size_);
+  std::swap(limit_, other.limit_);
+  std::swap(total_shares_, other.total_shares_);
+  std::swap(list_order_, other.list_order_);
+  std::swap(map_order_, other.map_order_);
+}
+
+void Limit::operator=(const Limit &other) {
+  size_ = other.size_;
+  limit_ = other.limit_;
+  total_shares_ = other.total_shares_;
+  list_order_ = other.list_order_;
+  map_order_.insert(other.map_order_.begin(), other.map_order_.end());
+}
+
+void Limit::operator=(Limit &&other) {
+  std::swap(size_, other.size_);
+  std::swap(limit_, other.limit_);
+  std::swap(total_shares_, other.total_shares_);
+  std::swap(list_order_, other.list_order_);
+  std::swap(map_order_, other.map_order_);
+}
 
 // public methods
 bool Limit::add_order(AddOrder &&order) {

@@ -34,8 +34,8 @@ public:
   explicit Avl(const Avl &);
   explicit Avl(Avl &&);
 
-  Avl &operator=(const Avl &);
-  Avl &operator=(Avl &&);
+  // Avl &operator=(const Avl &);
+  // Avl &operator=(Avl &&);
 
 public:
   // public methods
@@ -84,10 +84,8 @@ void Avl<T>::debug(const std::function<void(const T &)> &func) {
 // constructor & destructor
 template <typename T>
 Avl<T>::Avl(const Avl &other)
-    : root_(clone_(other.root_)), size_(other.size_), node_map_(),
-      comp_(other.comp_), top_(nullptr) {
-  node_map_.insert(other.node_map_.begin(), other.node_map_.end());
-}
+    : root_(clone_(other.root_)), size_(other.size_), comp_(other.comp_),
+      top_(nullptr), node_map_(other.node_map_) {}
 
 template <typename T> Avl<T>::Avl(Avl &&other) : Avl() {
   std::swap(root_, other);
@@ -212,7 +210,7 @@ void Avl<T>::insert_util_(T &&data, std::shared_ptr<Node> &cur_node,
   if (!cur_node) {
     cur_node =
         std::make_shared<Node>(std::forward<T>(data), nullptr, nullptr, parent);
-    node_map_[data] = cur_node;
+    node_map_[cur_node->data] = cur_node;
 
     if (top_) {
       if (comp_(top_->data, cur_node->data)) {

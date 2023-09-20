@@ -23,30 +23,27 @@ public:
 
 public:
   void debug() {
-    std::cout << "-----------top buy------------\n";
-    if (buy_tree_.top()) {
-      std::cout << buy_tree_.top()->data.limit() << '\n';
-    }
-    std::cout << "-----------top sell------------\n";
-    if (sell_tree_.top()) {
-      std::cout << sell_tree_.top()->data.limit() << '\n';
-    }
-
     std::cout << "----------buy side------------\n";
+    std::cout << "top limit: " << buy_tree_.top()->data.limit() << '\n';
     buy_tree_.debug([](const Limit &limit) {
       std::cout << "price level: " << limit.limit() << ' '
-                << "number orders: " << limit.list_order().size() << '\n';
+                << "number orders: " << limit.list_order().size() << ' '
+                << "total shares: " << limit.total_shares() << '\n';
 
+      std::cout << "id | shares | timestamp\n";
       for (const auto &order : limit.list_order()) {
         order.print();
       }
     });
 
     std::cout << "----------sell side------------\n";
+    std::cout << "top limit: " << sell_tree_.top()->data.limit() << '\n';
     sell_tree_.debug([](const Limit &limit) {
       std::cout << "price level: " << limit.limit() << ' '
-                << "number orders: " << limit.list_order().size() << '\n';
+                << "number orders: " << limit.list_order().size() << ' '
+                << "total shares: " << limit.total_shares() << '\n';
 
+      std::cout << "id | shares | timestamp\n";
       for (const auto &order : limit.list_order()) {
         order.print();
       }

@@ -35,8 +35,7 @@ public:
   inline const shares_t &shares() const noexcept { return shares_; }
 
   void print() const {
-    printf("shares: %lld | id: %d | timestamp: %lld\n", shares(), id(),
-           timestamp());
+    std::cout << id() << " | " << shares_ << " | " << timestamp() << '\n';
   }
 
   bool match(shares_t shares) noexcept {
