@@ -36,12 +36,12 @@ void Book::process_add_order_(AddOrder &&order) {
   }
 }
 
-timestamp_t Book::get_time_from_midnight_() {
-  auto now = std::chrono::system_clock::now();
-  auto today = std::chrono::floor<std::chrono::days>(now);
-  return std::chrono::duration_cast<std::chrono::nanoseconds>(now - today)
-      .count();
-}
+// timestamp_t Book::get_time_from_midnight_() {
+//   auto now = std::chrono::system_clock::now();
+//   auto today = std::chrono::floor<std::chrono::days>(now);
+//   return std::chrono::duration_cast<std::chrono::nanoseconds>(now - today)
+//       .count();
+// }
 } // namespace Orderbook
 
-#endif // !__BOOK_CPP__
+#endif // __BOOK_CPP__

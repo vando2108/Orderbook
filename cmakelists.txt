@@ -9,12 +9,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ENABLE_EXPORTS ON)
 
+# Add package
+find_package(Boost REQUIRED)
+find_package (glog 0.6.0 REQUIRED)
+
 # build options
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
 
-add_executable(${PROJECT_NAME} main.cpp)
+include_directories(${Boost_INCLUDE_DIRS})
+add_executable(${PROJECT_NAME} 
+  src/nasdaq/nasdaq.cpp
+  src/nasdaq/enum.cpp
+  src/main.cpp
+)
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} glog::glog)
 
 message(${CMAKE_SOURCE_DIR}/orderbook/build/)
 target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/orderbook/build/)
 target_link_libraries(${PROJECT_NAME} Orderbook)
+
+message(${CMAKE_SOURCE_DIR}/feed_handler/build/)
+target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/feed_handler/build/)
+target_link_libraries(${PROJECT_NAME} FeedHandler)
+
+message(${CMAKE_SOURCE_DIR}/algorithms/build/)
+target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/algorithms/build/)
+target_link_libraries(${PROJECT_NAME} Algorithms)

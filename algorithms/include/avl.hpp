@@ -3,17 +3,18 @@
 
 #include <algorithm>
 #include <functional>
+#include <glog/logging.h>
 #include <iostream>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
-namespace Orderbook {
 namespace Algorithms {
 template <typename T> class Avl {
 public:
-  typedef std::function<bool(const T &, const T &)> compare_t;
+  using compare_t = std::function<bool(const T &, const T &)>;
 
+private:
   struct Node {
     T data;
     uint32_t height;
@@ -34,9 +35,6 @@ public:
   explicit Avl(const Avl &);
   explicit Avl(Avl &&);
 
-  // Avl &operator=(const Avl &);
-  // Avl &operator=(Avl &&);
-
 public:
   // public methods
   void insert(T &&);
@@ -45,12 +43,13 @@ public:
 
   std::shared_ptr<Node> get_node(const T &);
 
-  void debug(const std::function<void(const T &)> &);
+  void debug(std::shared_ptr<Node>, const std::function<void(const T &)> &);
   std::vector<T> inorder() const;
 
 public:
   inline const std::shared_ptr<Node> &top() const { return top_; }
   inline const size_t &size() const { return size_; }
+  inline const std::shared_ptr<Node> &root() const { return root_; }
 
 private:
   // private methods
@@ -58,6 +57,11 @@ private:
                     const std::shared_ptr<Node> &);
   std::shared_ptr<Node> clone_(const std::shared_ptr<Node> &) const;
   void inorder_util_(const std::shared_ptr<Node> &, std::vector<T> &) const;
+
+  // remove utils
+  void remove_util_(std::shared_ptr<Node> &);
+  void remove_leaf_node_(std::shared_ptr<Node> &);
+  std::shared_ptr<Node> min_value_node_(const std::shared_ptr<Node> &);
 
   // rebalance utils
   void rebalance_(std::shared_ptr<Node> &);
@@ -74,11 +78,13 @@ private:
 };
 
 template <typename T>
-void Avl<T>::debug(const std::function<void(const T &)> &func) {
-  std::cout << "number of limits: " << size_ << '\n';
-  for (const auto &it : node_map_) {
-    func(it.second->data);
-  }
+void Avl<T>::debug(std::shared_ptr<Node> cur,
+                   const std::function<void(const T &)> &func) {
+  if (cur == nullptr)
+    return;
+  debug(cur->left, func);
+  func(cur->data);
+  debug(cur->right, func);
 }
 
 // constructor & destructor
@@ -119,6 +125,29 @@ template <typename T> void Avl<T>::remove_top() {
   remove(remove_data);
 }
 
+template <typename T>
+void Avl<T>::remove_leaf_node_(std::shared_ptr<Node> &node) {
+  node_map_.erase(node->data);
+  if (node->parent) {
+    if (node->parent->left == node)
+      node->parent->left = nullptr;
+    else
+      node->parent->right = nullptr;
+
+    node->parent = nullptr;
+  }
+}
+
+template <typename T>
+std::shared_ptr<typename Avl<T>::Node>
+min_value_node_(const std::shared_ptr<typename Avl<T>::Node> &node) {
+  auto temp = node;
+  while (temp->left) {
+    temp = temp->left;
+  }
+  return temp;
+}
+
 template <typename T> bool Avl<T>::remove(const T &data) {
   auto it = node_map_.find(data);
   if (it == node_map_.end()) {
@@ -128,6 +157,27 @@ template <typename T> bool Avl<T>::remove(const T &data) {
   auto node = it->second;
   std::shared_ptr<Node> parent = node->parent;
 
+  if (node->left == nullptr || node->right == nullptr) {
+    auto temp = node->left ? node->left : node->right;
+    if (temp == nullptr) {
+      /* no child <=> leaf node */
+      remove_leaf_node_(node);
+    } else {
+      /* has one child => swap data of current node with child node (temp) */
+      std::swap(node->data, temp->data);
+      std::swap(node_map_[node->data], node_map_[temp->data]);
+      remove_leaf_node_(temp);
+    }
+  } else {
+    /* has two child => swap current node value with min_value_node */
+    auto temp = min_value_node_(node->right);
+
+    std::swap(node->data, temp->data);
+    std::swap(node_map_[node->data], node_map_[temp->data]);
+
+    remove(temp->data);
+  }
+
   if (node->left == nullptr && node->right == nullptr) {
     // no child
     if (parent) {
@@ -136,6 +186,10 @@ template <typename T> bool Avl<T>::remove(const T &data) {
       } else {
         parent->right = nullptr;
       }
+    }
+
+    if (node == root_) {
+      root_ = node->parent;
     }
 
     node->parent = nullptr;
@@ -155,6 +209,7 @@ template <typename T> bool Avl<T>::remove(const T &data) {
       while (child->left)
         child = child->left;
     } else {
+      // has one child
       child = node->left ? node->left : node->right;
     }
     std::swap(child->data, node->data);
@@ -164,6 +219,31 @@ template <typename T> bool Avl<T>::remove(const T &data) {
   }
 
   return true;
+}
+
+template <typename T> void Avl<T>::remove_util_(std::shared_ptr<Node> &node) {
+  std::shared_ptr<Node> parent = node->parent;
+
+  if (node->left == nullptr || node->right == nullptr) {
+    auto temp = node->left ? node->left : node->right;
+    if (temp == nullptr) {
+      /* no child <=> leaf node */
+      remove_leaf_node_(node);
+    } else {
+      /* has one child => swap data of current node with child node (temp) */
+      std::swap(node->data, temp->data);
+      std::swap(node_map_[node->data], node_map_[temp->data]);
+      remove_leaf_node_(temp);
+    }
+  } else {
+    /* has two child => swap current node value with min_value_node */
+    auto temp = min_value_node_(node->right);
+
+    std::swap(node->data, temp->data);
+    std::swap(node_map_[node->data], node_map_[temp->data]);
+
+    remove_util_(temp);
+  }
 }
 
 template <typename T>
@@ -251,7 +331,6 @@ template <typename T> void Avl<T>::rebalance_(std::shared_ptr<Node> &cur_node) {
          / \
        T1   T2
       */
-      std::cout << "left left\n";
       right_rotate_(cur_node);
     } else {
       /*
@@ -279,7 +358,6 @@ template <typename T> void Avl<T>::rebalance_(std::shared_ptr<Node> &cur_node) {
               / \
             T3  T4
       */
-      std::cout << "right right\n";
       left_rotate_(cur_node);
     } else {
       /*
@@ -291,7 +369,6 @@ template <typename T> void Avl<T>::rebalance_(std::shared_ptr<Node> &cur_node) {
          / \                              /  \
        T2   T3                           T3   T4
       */
-      std::cout << "right left\n";
       std::shared_ptr<Node> temp = cur_node->right;
       right_rotate_(temp);
       left_rotate_(cur_node);
@@ -369,6 +446,5 @@ template <typename T> void Avl<T>::left_rotate_(std::shared_ptr<Node> &x) {
 }
 
 }; // namespace Algorithms
-}; // namespace Orderbook
 
 #endif // __ALGORITHMS_AVL_HPP__

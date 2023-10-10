@@ -1,7 +1,7 @@
 #ifndef __BOOK_HPP__
 #define __BOOK_HPP__
 
-#include "./avl.hpp"
+#include "../../algorithms/include/avl.hpp"
 #include "./limit.hpp"
 #include "common.hpp"
 #include "order.hpp"
@@ -16,58 +16,62 @@ namespace Orderbook {
 class Book {
 public:
   // constructor and destructor
-  Book()
+  explicit Book(const symbol_t &symbol)
       : buy_tree_([](const Limit &a, const Limit &b) { return a < b; }),
         sell_tree_([](const Limit &a, const Limit &b) { return a > b; }),
-        id_counter_(0) {}
+        id_counter_(0), symbol_(symbol) {}
 
 public:
   void debug() {
-    std::cout << "----------buy side------------\n";
-    std::cout << "top limit: " << buy_tree_.top()->data.limit() << '\n';
-    buy_tree_.debug([](const Limit &limit) {
-      std::cout << "price level: " << limit.limit() << ' '
+    LOG(INFO) << "----------buy side------------\n";
+    if (buy_tree_.top()) {
+      LOG(INFO) << "top limit: " << buy_tree_.top()->data.limit() << '\n';
+    }
+    buy_tree_.debug(buy_tree_.root(), [](const Limit &limit) {
+      LOG(INFO) << "price level: " << limit.limit() << ' '
                 << "number orders: " << limit.list_order().size() << ' '
                 << "total shares: " << limit.total_shares() << '\n';
 
-      std::cout << "id | shares | timestamp\n";
+      LOG(INFO) << "id | shares | timestamp\n";
       for (const auto &order : limit.list_order()) {
-        order.print();
+        order.log();
       }
     });
 
-    std::cout << "----------sell side------------\n";
-    std::cout << "top limit: " << sell_tree_.top()->data.limit() << '\n';
-    sell_tree_.debug([](const Limit &limit) {
-      std::cout << "price level: " << limit.limit() << ' '
+    LOG(INFO) << "----------sell side------------\n";
+    if (sell_tree_.top()) {
+      LOG(INFO) << "top limit: " << sell_tree_.top()->data.limit() << '\n';
+    }
+    sell_tree_.debug(sell_tree_.root(), [](const Limit &limit) {
+      LOG(INFO) << "price level: " << limit.limit() << ' '
                 << "number orders: " << limit.list_order().size() << ' '
                 << "total shares: " << limit.total_shares() << '\n';
 
-      std::cout << "id | shares | timestamp\n";
+      LOG(INFO) << "id | shares | timestamp\n";
       for (const auto &order : limit.list_order()) {
-        order.print();
+        order.log();
       }
     });
   }
 
 public:
   void process_order(std::derived_from<IOrder> auto &&);
+  inline const std::string_view symbol() const noexcept { return symbol_; };
 
 private:
   void process_add_order_(AddOrder &&);
+  // timestamp_t get_time_from_midnight_();
 
-  timestamp_t get_time_from_midnight_();
-
+private:
   id_t id_counter_;
+  symbol_t symbol_;
   Algorithms::Avl<Limit> buy_tree_, sell_tree_;
 };
 
 void Book::process_order(std::derived_from<IOrder> auto &&order) {
-  order.id_ = ++id_counter_;
-  order.timestamp_ = get_time_from_midnight_();
-
   if constexpr (std::is_same_v<std::remove_reference_t<decltype(order)>,
                                AddOrder>) {
+    order.debug();
     process_add_order_(std::forward<AddOrder>(order));
   } else {
   }

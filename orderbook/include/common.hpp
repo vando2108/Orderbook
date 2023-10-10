@@ -2,13 +2,14 @@
 #define __COMMON_HPP__
 
 #include <cstdint>
+#include <string_view>
 
 namespace Orderbook {
-typedef std::uint32_t id_t;
-typedef std::uint64_t limit_t;
-typedef std::uint16_t symbol_t;
-typedef std::uint64_t shares_t;
-typedef std::uint64_t timestamp_t;
+using id_t = std::uint32_t;
+using limit_t = std::uint64_t;
+using symbol_t = std::string;
+using shares_t = std::uint64_t;
+using timestamp_t = std::uint64_t;
 
 enum class Side { BUY, SELL };
 }; // namespace Orderbook

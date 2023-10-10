@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
-project(Orderbook)
+project(FeedHandler)
 message("--------------------------")
-message("Build Orderbook")
+message("Build FeedHandler")
 
 # Set variables
 set(CMAKE_CXX_STANDARD 20)
@@ -14,15 +14,11 @@ add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
 
 # Import third party library
+find_package(Boost REQUIRED)
 find_package(glog REQUIRED)
 
+include_directories(${Boost_INCLUDE_DIRS})
 add_library(${PROJECT_NAME} SHARED
-  src/limit.cpp
-  src/book.cpp
-  include/order.hpp
-  include/common.hpp
+  src/feed_handler.cpp
 )
-
-message(${CMAKE_SOURCE_DIR}/../algorithms/build/)
-target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/../algorithms/build/)
-target_link_libraries(${PROJECT_NAME} Algorithms glog::glog)
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} glog::glog)
