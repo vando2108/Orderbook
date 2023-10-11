@@ -14,8 +14,7 @@
 using nasdaq = exchange::nasdaq::nasdaq;
 
 void nasdaq::add_historical_feed(std::string_view path) {
-  boost::lockfree::queue<FeedHandler::message, boost::lockfree::capacity<1000>>
-      msg_queue;
+  FeedHandler::msg_queue_t msg_queue;
   std::unique_ptr<FeedHandler::IFeedHandler> feed_handler(
       std::make_unique<FeedHandler::NasdaqITCH50::NasdaqITCH50>(msg_queue));
 
@@ -60,13 +59,12 @@ void nasdaq::handle_order_action_(FeedHandler::message &&msg) {
     FeedHandler::NasdaqITCH50::AddOrderMessage parsed_msg(msg.buffer);
 
     Orderbook::AddOrder order(
-        parsed_msg.tracking_number,
+        parsed_msg.order_ref_number,
         (parsed_msg.is_buy_side ? Orderbook::Side::BUY : Orderbook::Side::SELL),
         parsed_msg.price, parsed_msg.shares, parsed_msg.timestamp,
         parsed_msg.symbol());
 
-    // if (order.symbol() == "E       ") {
-    execute_order_(std::move(order));
-    // }
+    if (order.symbol() == "TVIX    ")
+      execute_order_(std::move(order));
   }
 }

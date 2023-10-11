@@ -1,3 +1,4 @@
+#include "../algorithms/include/avl.hpp"
 #include "../feed_handler/include/feed_handler.hpp"
 #include "../include/nasdaq/nasdaq.hpp"
 
@@ -27,40 +28,64 @@ int main(int argc, char *argv[]) {
   FLAGS_minloglevel = google::INFO;
   google::InitGoogleLogging(argv[0]);
 
-  exchange::nasdaq::nasdaq nasdaq;
-  nasdaq.add_historical_feed("../data/12302019.NASDAQ_ITCH50");
+  // exchange::nasdaq::nasdaq nasdaq;
+  // nasdaq.add_historical_feed("../data/12302019.NASDAQ_ITCH50");
 
-  // Orderbook::Book e_book("E");
-  // std::vector<Orderbook::AddOrder> orders = {
-  //     Orderbook::AddOrder(0, Orderbook::Side::SELL, 310300, 3000,
-  //                         14400022387518, "E"),
-  //     Orderbook::AddOrder(0, Orderbook::Side::BUY, 312500, 3000,
-  //     14400024536615,
-  //                         "E"),
-  //     Orderbook::AddOrder(0, Orderbook::Side::SELL, 310800, 2000,
-  //                         14400025603453, "E"),
-  //     Orderbook::AddOrder(0, Orderbook::Side::SELL, 310700, 1000,
-  //                         14400026646003, "E"),
-  //     Orderbook::AddOrder(0, Orderbook::Side::BUY, 311900, 2000,
-  //     14400027862872,
-  //                         "E"),
-  //     Orderbook::AddOrder(0, Orderbook::Side::BUY, 312000, 2000,
-  //     14400028858496,
-  //                         "E"),
+  Orderbook::Book e_book("TVIX    ");
+  std::vector<Orderbook::AddOrder> orders = {
+      // Orderbook::AddOrder(1608, Orderbook::Side::SELL, 486000, 62,
+      //                     14400004727759, "TVIX    "),
+      // Orderbook::AddOrder(2720, Orderbook::Side::SELL, 486000, 500,
+      //                     14400007966912, "TVIX    "),
+
+      Orderbook::AddOrder(22056, Orderbook::Side::BUY, 80000000, 14,
+                          14400117591630, "TVIX    "),
+      Orderbook::AddOrder(30592, Orderbook::Side::BUY, 888888800, 19,
+                          14400429603160, "TVIX    "),
+      Orderbook::AddOrder(35880, Orderbook::Side::BUY, 1235900, 4000,
+                          14400940892500, "TVIX    "),
+      Orderbook::AddOrder(37768, Orderbook::Side::BUY, 49000000, 12,
+                          14401036279133, "TVIX    "),
+      Orderbook::AddOrder(59328, Orderbook::Side::BUY, 970000, 1000,
+                          14403904789654, "TVIX    "),
+      Orderbook::AddOrder(60108, Orderbook::Side::BUY, 1180000, 100,
+                          14404109440043, "TVIX    "),
+      Orderbook::AddOrder(68676, Orderbook::Side::BUY, 1180000, 60,
+                          14408324990118, "TVIX    "),
+
+      Orderbook::AddOrder(69052, Orderbook::Side::BUY, 1200000, 10,
+                          14408979343620, "TVIX    "),
+      // Orderbook::AddOrder(69060, Orderbook::Side::BUY, 1200000, 5,
+      //                     14409004248630, "TVIX    "),
+
+      // Orderbook::AddOrder(71124, Orderbook::Side::BUY, 850000, 20,
+      //                     14414357951370, "TVIX    "),
+  };
+
+  for (auto &order : orders) {
+    e_book.process_order(std::move(order));
+    e_book.debug();
+    LOG(INFO);
+    LOG(INFO);
+    LOG(INFO);
+    LOG(INFO);
+    LOG(INFO);
+  }
+
+  e_book.debug();
   //
-  // };
+  // Algorithms::Avl<int> avl([](int a, int b) { return a < b; });
+  // avl.insert(1605800);
+  // LOG(INFO) << avl.top()->data;
   //
-  // for (auto &order : orders) {
-  //   e_book.process_order(std::move(order));
-  //   e_book.debug();
-  //   LOG(INFO);
-  //   LOG(INFO);
-  //   LOG(INFO);
-  //   LOG(INFO);
-  //   LOG(INFO);
-  // }
-  //
-  // e_book.debug();
+  // avl.remove_top();
+  // avl.insert(500);
+  // avl.insert(800);
+  // avl.insert(700);
+  // avl.insert(900);
+  // avl.insert(1000);
+
+  // avl.debug(avl.root(), [](int a) { LOG(INFO) << a; });
 
   return 0;
 }

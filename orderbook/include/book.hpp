@@ -24,33 +24,41 @@ public:
 public:
   void debug() {
     LOG(INFO) << "----------buy side------------\n";
+
     if (buy_tree_.top()) {
+      LOG(INFO) << "top is not null";
       LOG(INFO) << "top limit: " << buy_tree_.top()->data.limit() << '\n';
+    } else {
+      LOG(INFO) << "top is null";
     }
+
     buy_tree_.debug(buy_tree_.root(), [](const Limit &limit) {
       LOG(INFO) << "price level: " << limit.limit() << ' '
                 << "number orders: " << limit.list_order().size() << ' '
                 << "total shares: " << limit.total_shares() << '\n';
 
-      LOG(INFO) << "id | shares | timestamp\n";
-      for (const auto &order : limit.list_order()) {
-        order.log();
-      }
+      // LOG(INFO) << "id | shares | timestamp\n";
+      // for (const auto &order : limit.list_order()) {
+      //   order.log();
+      // }
     });
 
     LOG(INFO) << "----------sell side------------\n";
     if (sell_tree_.top()) {
       LOG(INFO) << "top limit: " << sell_tree_.top()->data.limit() << '\n';
+    } else {
+      LOG(INFO) << "top is null";
     }
+
     sell_tree_.debug(sell_tree_.root(), [](const Limit &limit) {
       LOG(INFO) << "price level: " << limit.limit() << ' '
                 << "number orders: " << limit.list_order().size() << ' '
                 << "total shares: " << limit.total_shares() << '\n';
 
-      LOG(INFO) << "id | shares | timestamp\n";
-      for (const auto &order : limit.list_order()) {
-        order.log();
-      }
+      // LOG(INFO) << "id | shares | timestamp\n";
+      // for (const auto &order : limit.list_order()) {
+      //   order.log();
+      // }
     });
   }
 

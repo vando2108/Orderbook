@@ -30,15 +30,16 @@ protected:
       book_map_.insert(
           {order.symbol(), std::make_unique<Orderbook::Book>(order.symbol())});
     }
-    book_map_[order.symbol()]->process_order(std::move(order));
     // book_map_[order.symbol()]->debug();
+    book_map_[order.symbol()]->process_order(std::move(order));
+    // LOG(INFO);
+    // LOG(INFO);
   }
 
 private:
   /* each book will has unique order queue */
   std::unordered_map<Orderbook::symbol_t, std::unique_ptr<Orderbook::Book>>
       book_map_;
-  std::unordered_map<Orderbook::symbol_t, FeedHandler::msg_queue_t> queue_map_;
 };
 }; // namespace exchange
 

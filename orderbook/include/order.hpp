@@ -47,8 +47,13 @@ public:
   void debug() const noexcept {
     auto temp =
         side() == Side::SELL ? "Orderbook::Side::SELL" : "Orderbook::Side::BUY";
-    LOG(INFO) << id() << ", " << temp << ", " << limit() << ", " << shares()
-              << ", " << timestamp() << ", " << symbol();
+    LOG(INFO) << "Orderbook::AddOrder(" << id() << ", " << temp << ", "
+              << limit() << ", " << shares() << ", " << timestamp() << ", \""
+              << symbol() << "\"),\n";
+
+    // std::cout << "Orderbook::AddOrder(" << id() << ", " << temp << ", "
+    //           << limit() << ", " << shares() << ", " << timestamp() << ", \""
+    //           << symbol() << "\"),\n";
   };
 
   bool match(shares_t shares) noexcept {

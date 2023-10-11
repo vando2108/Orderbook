@@ -18,7 +18,7 @@ struct message {
 };
 
 using msg_queue_t =
-    boost::lockfree::queue<message, boost::lockfree::capacity<1000>>;
+    boost::lockfree::queue<message, boost::lockfree::capacity<100>>;
 }; // namespace FeedHandler
 
 #endif // __FEED_HANDLER_MESSAGE_HPP__

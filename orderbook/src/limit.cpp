@@ -43,13 +43,13 @@ void Limit::operator=(Limit &&other) {
 
 // public methods
 bool Limit::add_order(AddOrder &&order) {
-  if (map_order_.find(order.id()) != map_order_.end()) {
-    return false;
-  }
+  // if (map_order_.find(order.id()) != map_order_.end()) {
+  //   return false;
+  // }
 
   ++size_;
   list_order_.push_back(std::forward<AddOrder>(order));
-  map_order_[list_order_.back().limit()] = --list_order_.end();
+  // map_order_[list_order_.back().id()] = --list_order_.end();
   total_shares_ += order.shares();
 
   return true;

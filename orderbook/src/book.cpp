@@ -7,8 +7,9 @@
 
 namespace Orderbook {
 void Book::process_add_order_(AddOrder &&order) {
-  auto &op_limit_tree =
+  Algorithms::Avl<Limit> &op_limit_tree =
       order.side() == Side::BUY ? sell_tree_ : buy_tree_; // opposite limit tree
+
   auto comp = order.side() == Side::BUY
                   ? [](limit_t a, limit_t b) { return a <= b; }
                   : [](limit_t a, limit_t b) { return a >= b; };
@@ -25,11 +26,14 @@ void Book::process_add_order_(AddOrder &&order) {
 
   if (order.shares() > 0) {
     Limit limit(order);
-    auto &limit_tree = order.side() == Side::BUY ? buy_tree_ : sell_tree_;
+    Algorithms::Avl<Limit> &limit_tree =
+        order.side() == Side::BUY ? buy_tree_ : sell_tree_;
     auto node = limit_tree.get_node(limit);
 
     if (node) {
-      node->data.add_order(std::move(order));
+      if (!node->data.add_order(std::move(order))) {
+        LOG(WARNING) << "Failed to add new order to an existsed limit";
+      }
     } else {
       limit_tree.insert(std::move(limit));
     }
